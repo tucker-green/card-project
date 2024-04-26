@@ -40,6 +40,9 @@ const Navbar = () => {
         <Button color="inherit" component={Link} to="/dashboard">
           Dashboard
         </Button>
+        <Button color="inherit" component={Link} to="/members">
+          Members
+        </Button>
         <Button color="inherit" component={Link} to="/upload">
           Upload Card
         </Button>
@@ -53,6 +56,12 @@ const Navbar = () => {
             Sign In
           </Button>
         )}
+
+        {/* {user ? null : (
+          <Button color="inherit" component={Link} to="/register">
+            Register
+          </Button>
+        )} */}
       </Toolbar>
     </AppBar>
   );

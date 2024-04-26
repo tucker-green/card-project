@@ -1,49 +1,36 @@
-import React, { useState, useEffect } from "react";
-import { getDatabase, ref, onValue } from "firebase/database";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { db } from "../firebase-config";
+import { collection, getDocs } from "firebase/firestore";
 import { List, ListItem, ListItemText } from "@mui/material";
 
-function UserList({ onUserSelect }) {
+const UserList = () => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    const db = getDatabase();
-    const usersRef = ref(db, "users/");
+    const fetchUsers = async () => {
+      const usersCollection = collection(db, "users");
+      const userData = await getDocs(usersCollection);
+      setUsers(userData.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+    };
 
-    const unsubscribe = onValue(
-      usersRef,
-      (snapshot) => {
-        const data = snapshot.val();
-        if (data) {
-          const loadedUsers = Object.keys(data).map((key) => ({
-            id: key,
-            ...data[key],
-          }));
-          setUsers(loadedUsers);
-        } else {
-          console.log("No users found");
-        }
-      },
-      (error) => {
-        console.error("Firebase read failed: ", error);
-      }
-    );
-
-    return () => unsubscribe(); // Cleanup subscription
+    fetchUsers();
   }, []);
-
-  if (users.length === 0) {
-    return <p>No users available to chat with.</p>;
-  }
 
   return (
     <List>
       {users.map((user) => (
-        <ListItem key={user.id} button onClick={() => onUserSelect(user.id)}>
-          <ListItemText primary={user.name} />
+        <ListItem
+          button
+          component={Link}
+          to={`/users/${user.id}`}
+          key={user.id}
+        >
+          <ListItemText primary={user.displayName} />
         </ListItem>
       ))}
     </List>
   );
-}
+};
 
 export default UserList;
